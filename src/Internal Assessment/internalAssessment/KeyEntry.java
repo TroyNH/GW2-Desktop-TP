@@ -103,6 +103,6 @@ public class KeyEntry
 	
 	//Final variables.
 	static final int WIDTH = 550;
-	static final int HEIGHT = 140;
+	static final int HEIGHT = 150;
 	static final Dimension dim = Toolkit.getDefaultToolkit ().getScreenSize ();
 }
