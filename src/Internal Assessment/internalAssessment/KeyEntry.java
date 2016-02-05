@@ -5,25 +5,33 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 
-import purmutations.LimitFilter;
-
 //This class will handle entering the first or new API keys, it will also check if an API key is valid, and store API keys if requested.
 public class KeyEntry 
 {
 	//Constructor.
-	public KeyEntry ()
+	public KeyEntry () throws IOException
 	{
+		//File writer for storing saved keys
+		FileWriter filew = new FileWriter ("C:\\temp_Troy\\MySavedKeys.out");
+		PrintWriter output = new PrintWriter(filew);
+		
 		//Frame to hold input text box and labels for clarification.
 		JFrame keyEnter = new JFrame ();
 		
@@ -36,8 +44,10 @@ public class KeyEntry
 		JLabel instruct = new JLabel ("Please enter your API key.");
 		//Field for API key (72 characters)
 		JTextField keyField = new JTextField (46);
-		//Checkbox for if user wants to have app remember their key.
-		JCheckBox rememberKey = new JCheckBox ("Remember my key.");
+		//ComboBox for list of user's saved keys.
+		JComboBox rememberKey = new JComboBox ();
+		//Checkbox to save key.
+		JCheckBox rememberKeyBox = new JCheckBox ("Save my key.");
 		//Confirm button.
 		JButton confirmButton = new JButton ("Enter");
 		
@@ -48,6 +58,7 @@ public class KeyEntry
 		labelHolder.add (instruct);
 		textHolder.add (keyField);
 		rememberKeyandConfirmHolder.add (rememberKey);
+		rememberKeyandConfirmHolder.add (rememberKeyBox);
 		rememberKeyandConfirmHolder.add (confirmButton);
 		
 		//Adding panels to frame.
@@ -67,6 +78,11 @@ public class KeyEntry
 		{
 			public void actionPerformed (ActionEvent event)
 			{
+				if (rememberKeyBox.isSelected ())
+				{
+					
+				}
+				
 				//Check API key supplied by user when ENTER button is clicked.
 				@SuppressWarnings ("unused")
 				Authenticate running = new Authenticate(keyField.getText());
@@ -98,6 +114,20 @@ public class KeyEntry
 			{
 				
 			}
+		});
+		
+		//Check for a new selection from the combo box
+		rememberKey.addItemListener(new ItemListener ()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent event) 
+			{
+				if (event.getStateChange() == ItemEvent.SELECTED)
+				{
+					
+				}
+			}
+			
 		});
 	}
 	
