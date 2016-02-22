@@ -1,11 +1,11 @@
 package internalAssessment;
 
-import javax.swing.JFrame;
+import java.io.IOException;
 
 public class GW2TP 
 {
-	public static void main (String args[])
+	public static void main (String args[]) throws IOException
 	{
-		KeyEntry go = new KeyEntry();
+		new KeyEntry();
 	}
 }

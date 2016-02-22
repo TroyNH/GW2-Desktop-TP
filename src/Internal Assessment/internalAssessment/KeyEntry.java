@@ -9,15 +9,21 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.ArrayList;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
@@ -25,12 +31,18 @@ import javax.swing.text.AbstractDocument;
 //This class will handle entering the first or new API keys, it will also check if an API key is valid, and store API keys if requested.
 public class KeyEntry 
 {
+	String api_info;
+	String api_key;
+	
 	//Constructor.
 	public KeyEntry () throws IOException
-	{
-		//File writer for storing saved keys
-		FileWriter filew = new FileWriter ("C:\\temp_Troy\\MySavedKeys.out");
-		PrintWriter output = new PrintWriter(filew);
+	{	
+		//For file input
+		FileReader filew = new FileReader ("C://temp_troy//MySavedKeys.txt");
+		BufferedReader inp = new BufferedReader (filew);
+		
+		//Key saver object
+		SaveKeys saver = new SaveKeys ();
 		
 		//Frame to hold input text box and labels for clarification.
 		JFrame keyEnter = new JFrame ();
@@ -45,9 +57,33 @@ public class KeyEntry
 		//Field for API key (72 characters)
 		JTextField keyField = new JTextField (46);
 		//ComboBox for list of user's saved keys.
-		JComboBox rememberKey = new JComboBox ();
+		JComboBox <String> rememberKey = new JComboBox <String> ();
+		
+		rememberKey.addItem("Select Saved Key");
+		
+		String keyLine = inp.readLine();
+		
+		ArrayList <KeyCaller> keyInfo = new ArrayList <KeyCaller> ();
+		
+		while (keyLine != null)
+		{
+			JsonReader read = Json.createReader (new StringReader (keyLine));
+			JsonObject keyObject = read.readObject();
+			
+			read.close();
+			
+			rememberKey.addItem (keyObject.getString ("name"));
+			
+			keyInfo.add (new KeyCaller (keyObject.getString ("name"), keyObject.getString ("key")));
+			
+			keyLine = inp.readLine();
+		}
+		
+		inp.close();
+		
 		//Checkbox to save key.
 		JCheckBox rememberKeyBox = new JCheckBox ("Save my key.");
+		
 		//Confirm button.
 		JButton confirmButton = new JButton ("Enter");
 		
@@ -70,7 +106,7 @@ public class KeyEntry
 		keyEnter.setSize (WIDTH, HEIGHT);
 		keyEnter.setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 		keyEnter.setResizable (false);
-		keyEnter.setLocation (dim.width/2 - keyEnter.getSize().width/2, dim.height/2 - keyEnter.getSize().height);
+		keyEnter.setLocation (dim.width/2 - keyEnter.getSize().width/2, dim.height/2 - keyEnter.getSize().height/2);
 		keyEnter.setVisible (true);
 		
 		//ActionListener for button.
@@ -78,14 +114,32 @@ public class KeyEntry
 		{
 			public void actionPerformed (ActionEvent event)
 			{
-				if (rememberKeyBox.isSelected ())
+				CallRequests call = new CallRequests ();
+				
+				api_key = keyField.getText();
+				
+				try 
 				{
-					
+					String response = call.makerequest ("https://api.guildwars2.com/v2/tokeninfo?access_token=" + api_key);
+					api_info = response;
+				} 
+				catch (IOException e) 
+				{
+					JOptionPane.showMessageDialog (null, "We ran into an issue when attempting to authenticate your key, this could mean you entered an invalid key or that your computer could not connect to ArenaNet's servers.\n"
+					+ "Please make sure your key is correct and you are still connected to the internet.", "Problem with API Key", JOptionPane.ERROR_MESSAGE);
 				}
 				
-				//Check API key supplied by user when ENTER button is clicked.
-				@SuppressWarnings ("unused")
-				Authenticate running = new Authenticate(keyField.getText());
+				if (rememberKeyBox.isSelected ())
+				{
+					try 
+					{
+						saver.save (api_info,  api_key);
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 		
@@ -97,9 +151,31 @@ public class KeyEntry
 			{
 				if (event.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					//Check API key supplied by user when ENTER key is pressed.
-					@SuppressWarnings ("unused")
-					Authenticate running = new Authenticate(keyField.getText());
+					CallRequests call = new CallRequests ();
+					
+					api_key = keyField.getText ();
+					
+					try 
+					{
+						String response = call.makerequest ("https://api.guildwars2.com/v2/tokeninfo?access_token=" + api_key);
+						api_info = response;
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+					
+					if (rememberKeyBox.isSelected ());
+					{
+						try 
+						{
+							saver.save (api_info, api_key);
+						} 
+						catch (IOException e) 
+						{
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 
@@ -124,6 +200,16 @@ public class KeyEntry
 			{
 				if (event.getStateChange() == ItemEvent.SELECTED)
 				{
+					int index = rememberKey.getSelectedIndex() - 1;
+					
+					if (index > -1)
+					{
+						keyField.setText (keyInfo.get (index).getKey());
+					}
+					else if (index == -1)
+					{
+						keyField.setText ("");
+					}
 					
 				}
 			}

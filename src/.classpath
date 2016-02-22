@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="Internal Assessment"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/troyn/Desktop/External Libraries/javax.json-1.0.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/troyn/Desktop/External Libraries/javax.json-api-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/troyn/Desktop/External Libraries/okhttp-3.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/troyn/Desktop/External Libraries/okio-1.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
